@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
 import { Eye, EyeOff } from 'lucide-react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 
 interface LoginFormProps {
   onSwitchToRegister: () => void;
@@ -19,29 +19,78 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const { toast } = useToast();
-  const navigate = useNavigate(); // Define navigate using useNavigate
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    const result = await login(email, password);
+    try {
+      const result = await login(email, password);
 
-    if (result.success) {
-      toast({
-        title: "Success",
-        description: "You have been logged in successfully!",
-      });
-      navigate('/dashboard'); // Use navigate for redirection
-    } else {
+      if (result.success) {
+        toast({
+          title: "Success",
+          description: "You have been logged in successfully!",
+        });
+
+        // Get the updated user data from localStorage after successful login
+        const userDataString = localStorage.getItem('user');
+        console.log('Stored user data string:', userDataString);
+
+        if (userDataString) {
+          try {
+            const userData = JSON.parse(userDataString);
+            console.log('Parsed user data:', userData);
+            console.log('User roles:', userData.roles);
+
+            // Check user role and redirect accordingly
+            // Note: Your backend uses 'roleName' field, not 'name'
+            const isAdmin = userData.roles?.some((role: any) => {
+              console.log('Checking role:', role);
+              // Check for different possible role name formats
+              return role.roleName === 'ADMIN' ||
+                  role.roleName === 'admin' ||
+                  role.name === 'ADMIN' ||
+                  role.name === 'admin';
+            });
+
+            console.log('Is admin:', isAdmin);
+
+            if (isAdmin) {
+              console.log('Redirecting to instructor dashboard');
+              navigate('/instructor-dashboard');
+            } else {
+              console.log('Redirecting to student dashboard');
+              navigate('/student-dashboard');
+            }
+          } catch (parseError) {
+            console.error('Error parsing user data from localStorage:', parseError);
+            // Fallback - redirect to student dashboard if we can't parse the data
+            navigate('/student-dashboard');
+          }
+        } else {
+          console.warn('No user data found in localStorage');
+          // Fallback - redirect to student dashboard
+          navigate('/student-dashboard');
+        }
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Login Failed",
+          description: result.message || "Please check your credentials and try again.",
+        });
+      }
+    } catch (error) {
+      console.error('Login form error:', error);
       toast({
         variant: "destructive",
-        title: "Login Failed",
-        description: result.message || "Please check your credentials and try again.",
+        title: "Login Error",
+        description: "An unexpected error occurred. Please try again.",
       });
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   return (
