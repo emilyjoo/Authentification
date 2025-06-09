@@ -2,11 +2,12 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '../contexts/AuthContext';
-import { Book, Users, User, BookOpen, Plus } from 'lucide-react';
+import { Book, Users, User, BookOpen, Plus, UserPlus } from 'lucide-react';
 
 const Navigation: React.FC = () => {
     const { user, logout } = useAuth();
     const location = useLocation();
+
 
     const isActive = (path: string) => location.pathname === path;
 
@@ -71,6 +72,17 @@ const Navigation: React.FC = () => {
             >
                 <Plus className="h-4 w-4" />
                 <span>Add Course</span>
+            </Link>
+            <Link
+                to="/add-instructor"
+                className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    isActive('/add-instructor')
+                        ? 'text-blue-600 bg-blue-50'
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                }`}
+            >
+                <UserPlus className="h-4 w-4" />
+                <span>Add Instructor</span>
             </Link>
         </>
     )}

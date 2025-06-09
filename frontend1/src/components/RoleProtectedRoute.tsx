@@ -47,8 +47,9 @@ const RoleProtectedRoute: React.FC<RoleProtectedRouteProps> = ({
         );
     }
     // Check if user has the required role
+    const allowedRoles = ['admin', 'instructor'];
     const hasRequiredRole = user.roles?.some(role =>
-        role.roleName.toLowerCase() === requiredRole.toLowerCase()
+        allowedRoles.includes(role.roleName?.toLowerCase())
     );
 
     if (!hasRequiredRole) {

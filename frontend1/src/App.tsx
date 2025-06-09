@@ -16,6 +16,7 @@ import AddCourse from "./pages/AddCourse";
 import StudentDashboard from "./pages/StudentDashboard";
 import InstructorDashboard from "./pages/InstructorDashboard";
 import NotFound from "./pages/NotFound";
+import AddInstructor from "./pages/AddInstructor";
 
 const queryClient = new QueryClient();
 
@@ -63,6 +64,16 @@ const App = () => (
                           <ProtectedRoute>
                               <RoleProtectedRoute requiredRole="ADMIN" fallbackPath="/student-dashboard">
                                   <AddCourse />
+                              </RoleProtectedRoute>
+                          </ProtectedRoute>
+                      }
+                  />
+                  <Route
+                      path="/add-instructor"
+                      element={
+                          <ProtectedRoute>
+                              <RoleProtectedRoute requiredRole="ADMIN" fallbackPath="/student-dashboard">
+                                  <AddInstructor />
                               </RoleProtectedRoute>
                           </ProtectedRoute>
               } 

@@ -78,7 +78,7 @@ const AddCourse: React.FC = () => {
         setIsLoading(true);
 
         try {
-            const response = await fetch('http://localhost:8082/api/courses', {
+            const response = await fetch('http://localhost:8085/api/courses', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

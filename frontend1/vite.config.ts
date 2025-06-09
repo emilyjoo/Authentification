@@ -13,8 +13,8 @@ export default defineConfig(({ mode }) => ({
         rewrite: (path) => path.replace(/^\/api/, '')
       }
     },
-    host: "::",
-    port: 8082,
+    host:"::",
+    port:8082,
   },
   plugins: [
     react(),
