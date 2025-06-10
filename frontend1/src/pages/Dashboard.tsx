@@ -28,10 +28,10 @@ const Dashboard: React.FC = () => {
     setError(null);
 
     try {
-      console.log('Fetching instructors from:', 'http://localhost:8085/api/instructors');
+      console.log('Fetching instructors from:', 'http://localhost:8085/api/users/instructors');
       console.log('Using token:', token ? 'Token present' : 'No token');
 
-      const response = await fetch('http://localhost:8085/api/instructors', {
+      const response = await fetch('http://localhost:8085/api/users/instructors', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

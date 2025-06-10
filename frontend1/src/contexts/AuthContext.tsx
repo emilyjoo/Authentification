@@ -21,6 +21,8 @@ interface AuthContextType {
   logout: () => void;
   isLoading: boolean;
   fetchRoles: () => Promise<Role[]>;
+  isAdmin: () => boolean;
+  isInstructor: () => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -41,6 +43,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  const isAdmin = () => {
+    return user?.roles?.some(role => role.roleName === 'ADMIN') || false;
+  };
+
+  const isInstructor = () => {
+    return user?.roles?.some(role => role.roleName === 'INSTRUCTOR') || false;
+  };
 
   useEffect(() => {
     const initializeAuth = () => {
@@ -260,6 +270,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     logout,
     isLoading,
     fetchRoles,
+    isAdmin,
+    isInstructor,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
