@@ -1,6 +1,7 @@
 package ma.stepbystep.loginregistration.Controller;
 
 import ma.stepbystep.loginregistration.Entity.AppUser;
+import ma.stepbystep.loginregistration.Entity.RoleName;
 import ma.stepbystep.loginregistration.Service.AppUserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -54,4 +55,23 @@ public class AppUserController {
     public ResponseEntity<List<AppUser>> getAllUsers() {
         return ResponseEntity.ok(appUserService.getAllUsers());
     }
+
+    @GetMapping("/role/{role}")
+    public ResponseEntity<List<AppUser>> getUsersByRole(@PathVariable String role) {
+        try {
+            RoleName roleName = RoleName.valueOf(role.toUpperCase());
+            List<AppUser> users = appUserService.getUsersByRole(roleName);
+            return ResponseEntity.ok(users);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/instructors")
+    public ResponseEntity<List<AppUser>> getInstructors() {
+        return ResponseEntity.ok(appUserService.getUsersByRole(RoleName.INSTRUCTOR));
+    }
+
 }
+
+

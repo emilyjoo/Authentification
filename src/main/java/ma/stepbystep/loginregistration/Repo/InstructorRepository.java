@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface InstructorRepository extends JpaRepository<Instructor, Long> {
@@ -15,4 +16,6 @@ public interface InstructorRepository extends JpaRepository<Instructor, Long> {
     List<Instructor> findByCourseId(@Param("courseId") Long courseId);
 
     boolean existsByEmail(String email);
+    boolean existsByUser_Id(Long userId);
+    Optional<Instructor> findByUser_Id(Long userId);
 }

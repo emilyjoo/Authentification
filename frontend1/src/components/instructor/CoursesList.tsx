@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Users, Calendar } from 'lucide-react';
+import { Users, Calendar, Edit, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface InstructorCourse {
@@ -19,12 +19,18 @@ interface CoursesListProps {
     courses: InstructorCourse[];
     selectedCourse: number | null;
     onCourseSelect: (courseId: number) => void;
+    onEditCourse: (course: InstructorCourse) => void;
+    onDeleteCourse: (courseId: number) => void;
+    isDeleting: boolean;
 }
 
 const CoursesList: React.FC<CoursesListProps> = ({
                                                      courses,
                                                      selectedCourse,
-                                                     onCourseSelect
+                                                     onCourseSelect,
+                                                     onEditCourse,
+                                                     onDeleteCourse,
+                                                     isDeleting
                                                  }) => {
     const getStatusBadge = (status: string) => {
         switch (status) {
@@ -56,16 +62,41 @@ const CoursesList: React.FC<CoursesListProps> = ({
                         >
                             <div className="flex justify-between items-start mb-2">
                                 <h3 className="font-semibold">{course.name}</h3>
-                                {getStatusBadge(course.status)}
+                                <div className="flex items-center gap-2">
+                                    {getStatusBadge(course.status)}
+                                    <div className="flex gap-1">
+                                        <Button
+                                            size="sm"
+                                            variant="ghost"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onEditCourse(course);
+                                            }}
+                                        >
+                                            <Edit className="h-4 w-4"/>
+                                        </Button>
+                                        <Button
+                                            size="sm"
+                                            variant="ghost"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onDeleteCourse(course.id);
+                                            }}
+                                            disabled={isDeleting}
+                                        >
+                                            <Trash2 className="h-4 w-4"/>
+                                        </Button>
+                                    </div>
+                                </div>
                             </div>
                             <p className="text-sm text-gray-600 mb-2">{course.description}</p>
                             <div className="flex justify-between items-center text-sm">
                 <span className="flex items-center text-gray-600">
-                  <Users className="h-4 w-4 mr-1" />
+                  <Users className="h-4 w-4 mr-1"/>
                     {course.enrollmentCount} students
                 </span>
                                 <span className="flex items-center text-gray-600">
-                  <Calendar className="h-4 w-4 mr-1" />
+                  <Calendar className="h-4 w-4 mr-1"/>
                                     {new Date(course.startDate).toLocaleDateString()}
                 </span>
                             </div>

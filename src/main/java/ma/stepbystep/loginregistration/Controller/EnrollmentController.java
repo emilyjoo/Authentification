@@ -1,5 +1,6 @@
 package ma.stepbystep.loginregistration.Controller;
 
+import ma.stepbystep.loginregistration.Dto.EnrollmentDTO;
 import ma.stepbystep.loginregistration.Entity.Enrollment;
 import ma.stepbystep.loginregistration.Service.EnrollmentService;
 import jakarta.validation.Valid;
@@ -22,12 +23,17 @@ public class EnrollmentController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createEnrollment(@Valid @RequestBody Enrollment enrollment, BindingResult result) {
-        if (result.hasErrors()) {
-            return ResponseEntity.badRequest().body(result.getAllErrors());
+    public ResponseEntity<?> createEnrollment(@Valid @RequestBody EnrollmentDTO enrollmentDTO) {
+        try {
+            Enrollment enrollment = enrollmentService.enrollStudent(
+                    enrollmentDTO.getStudentId(),
+                    enrollmentDTO.getCourseId(),
+                    enrollmentDTO.getEnrollmentDate()
+            );
+            return new ResponseEntity<>(enrollment, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-        Enrollment createdEnrollment = enrollmentService.enrollStudent(enrollment);
-        return new ResponseEntity<>(createdEnrollment, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")

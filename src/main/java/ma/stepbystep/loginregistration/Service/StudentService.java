@@ -9,4 +9,7 @@ public interface StudentService {
     void deleteStudent(Long id);
     List<Student> getAllStudents();
     Student getStudentById(Long id);
+    public boolean existsByEmail(String email);
+    public Student getStudentByEmail(String email);
+    public Student findByUserId(Long userId);
 }

@@ -1,8 +1,11 @@
 import React, {useState} from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import StatsCards from '../components/instructor/StatsCards';
 import CoursesList from '../components/instructor/CoursesList';
 import StudentsTable from '../components/instructor/StudentsTable';
+import EditCourseModal from '../components/instructor/EditCourseModal';
+import { useToast } from '@/hooks/use-toast';
 
 interface InstructorCourse {
     id: number;
@@ -14,106 +17,197 @@ interface InstructorCourse {
     status: 'active' | 'completed' | 'upcoming';
 }
 
-interface Student {
-    id: number;
-    name: string;
-    email: string;
-    enrollmentDate: string;
-}
 
 const InstructorDashboard: React.FC = () => {
-    const {user} = useAuth();
+    const { user, token } = useAuth();
+    const { toast } = useToast();
+    const queryClient = useQueryClient();
     const [selectedCourse, setSelectedCourse] = useState<number | null>(null);
+    const [editingCourse, setEditingCourse] = useState<InstructorCourse | null>(null);
 
-    // Mock data - this would come from your Spring Boot API
-    const instructorCourses: InstructorCourse[] = [
-        {
-            id: 1,
-            name: "Introduction to React",
-            description: "Learn the fundamentals of React including components, state management, and hooks.",
-            startDate: "2024-07-01",
-            endDate: "2024-09-01",
-            enrollmentCount: 45,
-            status: 'active'
-        },
-        {
-            id: 2,
-            name: "Advanced React Patterns",
-            description: "Deep dive into advanced React patterns and optimization techniques.",
-            startDate: "2024-09-15",
-            endDate: "2024-12-15",
-            enrollmentCount: 23,
-            status: 'upcoming'
-        },
-        {
-            id: 3,
-            name: "React Fundamentals",
-            description: "Previous semester's React course.",
-            startDate: "2024-03-01",
-            endDate: "2024-05-01",
-            enrollmentCount: 52,
-            status: 'completed'
-        }
-    ];
-    const enrolledStudents: Student[] = [
-        {
-            id: 1,
-            name: "Alice Johnson",
-            email: "alice.johnson@gmail.com",
-            enrollmentDate: "2024-06-15"
-        },
-        {
-            id: 2,
-            name: "Bob Smith",
-            email: "bob.smith@gmail.com",
-            enrollmentDate: "2024-06-16"
-        },
-        {
-            id: 3,
-            name: "Carol Davis",
-            email: "carol.davis@yahoo.com",
-            enrollmentDate: "2024-06-17"
-        }
-    ];
+    // Fetch courses from backend
+    const { data: instructorCourses = [], isLoading: coursesLoading, error: coursesError } = useQuery({
+        queryKey: ['instructor-courses'],
+        queryFn: async () => {
+            const response = await fetch('http://localhost:8085/api/courses/instructor', {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
 
+            if (!response.ok) {
+                throw new Error('Failed to fetch courses');
+            }
 
+            return response.json();
+        },
+        enabled: !!token,
+    });
+    // Fetch enrolled students for selected course
+    const { data: enrolledStudents = [] } = useQuery({
+        queryKey: ['course-students', selectedCourse],
+        queryFn: async () => {
+            if (!selectedCourse) return [];
 
-    const stats = {
-        totalCourses: instructorCourses.length,
-        activeCourses: instructorCourses.filter(c => c.status === 'active').length,
-        totalStudents: instructorCourses.reduce((acc, course) => acc + course.enrollmentCount, 0),
-        upcomingCourses: instructorCourses.filter(c => c.status === 'upcoming').length
+            const response = await fetch(`http://localhost:8085/api/courses/${selectedCourse}/students`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch students');
+            }
+
+            return response.json();
+        },
+        enabled: !!selectedCourse && !!token,
+    });
+    // Update course mutation
+    const updateCourseMutation = useMutation({
+        mutationFn: async (course: InstructorCourse) => {
+            const response = await fetch(`http://localhost:8085/api/courses/${course.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(course),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update course');
+            }
+
+            return response.json();
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['instructor-courses'] });
+            toast({
+                title: "Success",
+                description: "Course updated successfully",
+            });
+            setEditingCourse(null);
+        },
+        onError: (error: Error) => {
+            toast({
+                title: "Error",
+                description: error.message,
+                variant: "destructive",
+            });
+        },
+    });
+    // Delete course mutation
+    const deleteCourseMutation = useMutation({
+        mutationFn: async (courseId: number) => {
+            const response = await fetch(`http://localhost:8085/api/courses/${courseId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to delete course');
+            }
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['instructor-courses'] });
+            toast({
+                title: "Success",
+                description: "Course deleted successfully",
+            });
+            setSelectedCourse(null);
+        },
+        onError: (error: Error) => {
+            toast({
+                title: "Error",
+                description: error.message,
+                variant: "destructive",
+            });
+        },
+    });
+    const handleEditCourse = (course: InstructorCourse) => {
+        setEditingCourse(course);
     };
-    return (
-        <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-6xl mx-auto">
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Instructor Dashboard</h1>
-                    <p className="text-gray-600">Welcome back, {user?.username}! Manage your courses and students.</p>
-                </div>
 
-                <StatsCards
-                    totalCourses={stats.totalCourses}
-                    activeCourses={stats.activeCourses}
-                    totalStudents={stats.totalStudents}
-                    upcomingCourses={stats.upcomingCourses}
-                />
+    const handleDeleteCourse = (courseId: number) => {
+        if (window.confirm('Are you sure you want to delete this course?')) {
+            deleteCourseMutation.mutate(courseId);
+        }
+    };
 
-                <div className="grid lg:grid-cols-2 gap-6">
-                    <CoursesList
-                        courses={instructorCourses}
-                        selectedCourse={selectedCourse}
-                        onCourseSelect={setSelectedCourse}
-                    />
+    const handleUpdateCourse = (updatedCourse: InstructorCourse) => {
+        updateCourseMutation.mutate(updatedCourse);
+    };
 
-                    <StudentsTable
-                        students={enrolledStudents}
-                        selectedCourse={selectedCourse}
-                    />
+    if (coursesLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+            </div>
+        );
+    }
+
+    if (coursesError) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                    <h2 className="text-2xl font-bold text-red-600 mb-4">Error Loading Courses</h2>
+                    <p className="text-gray-600">Failed to load your courses. Please try again later.</p>
                 </div>
             </div>
-        </div>
-    );
-};
+        );
+    }
+        const stats = {
+            totalCourses: instructorCourses.length,
+            activeCourses: instructorCourses.filter((c: InstructorCourse) => c.status === 'active').length,
+            totalStudents: instructorCourses.reduce((acc: number, course: InstructorCourse) => acc + course.enrollmentCount, 0),
+            upcomingCourses: instructorCourses.filter((c: InstructorCourse) => c.status === 'upcoming').length
+        };
+        return (
+            <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+                <div className="max-w-6xl mx-auto">
+                    <div className="mb-8">
+                        <h1 className="text-3xl font-bold text-gray-900 mb-2">Instructor Dashboard</h1>
+                        <p className="text-gray-600">Welcome back, {user?.username}! Manage your courses and students.</p>
+                    </div>
 
-export default InstructorDashboard;
+                    <StatsCards
+                        totalCourses={stats.totalCourses}
+                        activeCourses={stats.activeCourses}
+                        totalStudents={stats.totalStudents}
+                        upcomingCourses={stats.upcomingCourses}
+                    />
+
+                    <div className="grid lg:grid-cols-2 gap-6">
+                        <CoursesList
+                            courses={instructorCourses}
+                            selectedCourse={selectedCourse}
+                            onCourseSelect={setSelectedCourse}
+                            onEditCourse={handleEditCourse}
+                            onDeleteCourse={handleDeleteCourse}
+                            isDeleting={deleteCourseMutation.isPending}
+                        />
+                        <StudentsTable
+                            students={enrolledStudents}
+                            selectedCourse={selectedCourse}
+                        />
+                    </div>
+
+                    {editingCourse && (
+                        <EditCourseModal
+                            course={editingCourse}
+                            onSave={handleUpdateCourse}
+                            onCancel={() => setEditingCourse(null)}
+                            isLoading={updateCourseMutation.isPending}
+                        />
+                    )}
+                </div>
+            </div>
+        );
+    };
+    export default InstructorDashboard;

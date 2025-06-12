@@ -36,6 +36,10 @@ public class Instructor {
     @OneToMany(mappedBy = "instructor", cascade = CascadeType.ALL)
     private Set<Course> courses;
 
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private AppUser user;
+
     public Long getId() {
         return id;
     }
@@ -75,4 +79,12 @@ public class Instructor {
     public void setCourses(Set<Course> courses) {
         this.courses = courses;
     }
+
+    public AppUser getUser() {
+        return user;
+    }
+    public void setUser(AppUser user) {
+        this.user = user;
+    }
+
 }

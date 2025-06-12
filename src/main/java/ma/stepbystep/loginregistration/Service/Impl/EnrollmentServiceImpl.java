@@ -1,21 +1,31 @@
 package ma.stepbystep.loginregistration.Service.Impl;
 
 
+import lombok.RequiredArgsConstructor;
+import ma.stepbystep.loginregistration.Entity.Course;
 import ma.stepbystep.loginregistration.Entity.Enrollment;
+import ma.stepbystep.loginregistration.Entity.Student;
+import ma.stepbystep.loginregistration.Repo.CourseRepository;
+import ma.stepbystep.loginregistration.Repo.StudentRepository;
 import ma.stepbystep.loginregistration.exception.EnrollmentNotFoundException;
 import ma.stepbystep.loginregistration.Repo.EnrollmentRepository;
 import ma.stepbystep.loginregistration.Service.EnrollmentService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
 public class EnrollmentServiceImpl implements EnrollmentService {
     private final EnrollmentRepository enrollmentRepository;
+    private final StudentRepository studentRepository; // Must be final
+    private final CourseRepository courseRepository;
 
-    public EnrollmentServiceImpl(EnrollmentRepository enrollmentRepository) {
+    public EnrollmentServiceImpl(EnrollmentRepository enrollmentRepository, StudentRepository studentRepository, CourseRepository courseRepository) {
         this.enrollmentRepository = enrollmentRepository;
+        this.studentRepository = studentRepository;
+        this.courseRepository = courseRepository;
     }
 
     @Override
@@ -68,5 +78,20 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     @Transactional(readOnly = true)
     public List<Enrollment> getAllEnrollments() {
         return enrollmentRepository.findAll();
+    }
+
+    public Enrollment enrollStudent(Long studentId, Long courseId, LocalDate enrollmentDate) {
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new RuntimeException("Student not found"));
+
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new RuntimeException("Course not found"));
+
+        Enrollment enrollment = new Enrollment();
+        enrollment.setStudent(student);
+        enrollment.setCourse(course);
+        enrollment.setEnrollmentDate(enrollmentDate);
+
+        return enrollmentRepository.save(enrollment);
     }
 }

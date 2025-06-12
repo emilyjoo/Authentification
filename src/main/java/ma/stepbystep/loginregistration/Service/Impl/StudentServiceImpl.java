@@ -5,6 +5,7 @@ import ma.stepbystep.loginregistration.exception.DuplicateEmailException;
 import ma.stepbystep.loginregistration.exception.StudentNotFoundException;
 import ma.stepbystep.loginregistration.Repo.StudentRepository;
 import ma.stepbystep.loginregistration.Service.StudentService;
+import ma.stepbystep.loginregistration.exception.UserNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,50 +19,74 @@ public class StudentServiceImpl implements StudentService {
         this.studentRepository = studentRepository;
     }
 
-    @Override
-    @Transactional
     public Student createStudent(Student student) {
-        if (studentRepository.existsByEmail(student.getEmail())) {
-            throw new DuplicateEmailException(student.getEmail());
+        try {
+            // Check if student with this email already exists
+            if (studentRepository.findByEmail(student.getEmail()).isPresent()) {
+                throw new RuntimeException("Student with email " + student.getEmail() + " already exists");
+            }
+
+            return studentRepository.save(student);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create student: " + e.getMessage());
         }
-        return studentRepository.save(student);
     }
 
-    @Override
-    @Transactional
     public Student updateStudent(Long id, Student student) {
-        Student existingStudent = studentRepository.findById(id)
-                .orElseThrow(() -> new StudentNotFoundException(id));
+        try {
+            Student existingStudent = getStudentById(id);
 
-        if (!existingStudent.getEmail().equals(student.getEmail()) &&
-                studentRepository.existsByEmail(student.getEmail())) {
-            throw new DuplicateEmailException(student.getEmail());
+            // Check if email is being changed and if new email already exists
+            if (!existingStudent.getEmail().equals(student.getEmail())) {
+                if (studentRepository.findByEmail(student.getEmail()).isPresent()) {
+                    throw new RuntimeException("Student with email " + student.getEmail() + " already exists");
+                }
+            }
+
+            existingStudent.setEmail(student.getEmail());
+            existingStudent.setName(student.getName());
+
+            return studentRepository.save(existingStudent);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to update student: " + e.getMessage());
         }
-
-        existingStudent.setName(student.getName());
-        existingStudent.setEmail(student.getEmail());
-        return studentRepository.save(existingStudent);
     }
 
-    @Override
-    @Transactional
     public void deleteStudent(Long id) {
-        if (!studentRepository.existsById(id)) {
-            throw new StudentNotFoundException(id);
+        try {
+            if (!studentRepository.existsById(id)) {
+                throw new RuntimeException("Student with id " + id + " not found");
+            }
+            studentRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to delete student: " + e.getMessage());
         }
-        studentRepository.deleteById(id);
     }
 
-    @Override
-    @Transactional(readOnly = true)
     public List<Student> getAllStudents() {
-        return studentRepository.findAll();
+        try {
+            return studentRepository.findAll();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to retrieve students: " + e.getMessage());
+        }
     }
 
-    @Override
-    @Transactional(readOnly = true)
     public Student getStudentById(Long id) {
         return studentRepository.findById(id)
-                .orElseThrow(() -> new StudentNotFoundException(id));
+                .orElseThrow(() -> new RuntimeException("Student with id " + id + " not found"));
+    }
+
+    public Student getStudentByEmail(String email) {
+        return studentRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Student with email " + email + " not found"));
+    }
+
+    public boolean existsByEmail(String email) {
+        return studentRepository.findByEmail(email).isPresent();
+    }
+
+    public Student findByUserId(Long userId) {
+        return studentRepository.findByUser_Id(userId)
+                .orElseThrow(() -> new RuntimeException("Student with email " + userId + " not found"));
     }
 }

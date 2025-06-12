@@ -1,6 +1,7 @@
 package ma.stepbystep.loginregistration.Service;
 
 import ma.stepbystep.loginregistration.Entity.AppUser;
+import ma.stepbystep.loginregistration.Entity.RoleName;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
@@ -16,4 +17,5 @@ public interface AppUserService {
     List<AppUser> getAllUsers();
     AppUser getUserById(Long id);
     UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
+    public List<AppUser> getUsersByRole(RoleName roleName);
 }

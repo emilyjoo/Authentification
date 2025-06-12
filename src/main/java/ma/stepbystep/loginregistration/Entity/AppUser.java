@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -35,13 +36,22 @@ public class AppUser {
     )
     private String password;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, fetch = FetchType.EAGER)
     @JoinTable(
-            name = "user_roles",
+            name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private Set<Role> roles;
+    private Set<Role> roles = new HashSet<>();
+
+    // Constructors
+    public AppUser() {}
+
+    public AppUser(String username, String email, String password) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+    }
 
     public Long getId() {
         return id;
@@ -82,4 +92,28 @@ public class AppUser {
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
+
+    // Utility methods
+    public boolean hasRole(String roleName) {
+        return roles != null && roles.stream()
+                .anyMatch(role -> roleName.equals(role.getRoleName()));
+    }
+
+    public boolean hasRole(RoleName roleName) {
+        return roles != null && roles.stream()
+                .anyMatch(role -> roleName.name().equals(role.getRoleName()));
+    }
+
+    public boolean isUser() {
+        return hasRole(RoleName.USER);
+    }
+
+    public boolean isAdmin() {
+        return hasRole(RoleName.ADMIN);
+    }
+
+    public boolean isInstructor() {
+        return hasRole(RoleName.INSTRUCTOR);
+    }
+
 }

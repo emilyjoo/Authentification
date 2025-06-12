@@ -1,5 +1,6 @@
 package ma.stepbystep.loginregistration.Service.Impl;
 
+import ma.stepbystep.loginregistration.Entity.RoleName;
 import ma.stepbystep.loginregistration.exception.UserNotFoundException;
 import ma.stepbystep.loginregistration.exception.DuplicateEmailException;
 
@@ -66,4 +67,11 @@ public class AppUserServiceImpl implements AppUserService, UserDetailsService {
 
         return new User(appUser.getEmail(), appUser.getPassword(), new ArrayList<>());
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<AppUser> getUsersByRole(RoleName roleName) {
+        return appUserRepository.findByRoleName(roleName);
+    }
+
 }

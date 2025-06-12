@@ -9,4 +9,8 @@ public interface InstructorService {
     void deleteInstructor(Long id);
     List<Instructor> getAllInstructors();
     Instructor getInstructorById(Long id);
+    boolean instructorExistsByUserId(Long userId);
+    Instructor getInstructorByUserId(Long userId);
+
+
 }

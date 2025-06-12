@@ -1,5 +1,6 @@
 package ma.stepbystep.loginregistration.Entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -25,12 +26,14 @@ public class Course {
     @Size(min = 10, max = 1000, message = "Course description must be between 10 and 1000 characters")
     private String description;
 
+
+    @JsonManagedReference
     @NotNull(message = "Instructor is mandatory")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "instructor_id", nullable = false)
     private Instructor instructor;
 
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Enrollment> enrollments;
 
     @NotNull(message = "Start date is mandatory")
@@ -38,6 +41,20 @@ public class Course {
 
     @NotNull(message = "End date is mandatory")
     private LocalDate endDate;
+
+    @NotNull(message = "Max students is mandatory")
+    private Integer maxStudents;
+
+    @NotNull(message = "Price is mandatory")
+    private Double price;
+
+    @NotBlank(message = "Category is mandatory")
+    private String category;
+
+    @Transient
+    public Integer getEnrollmentCount() {
+        return enrollments != null ? enrollments.size() : 0;
+    }
 
     public Long getId() {
         return id;
@@ -93,5 +110,29 @@ public class Course {
 
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
+    }
+
+    public Integer getMaxStudents() {
+        return maxStudents;
+    }
+
+    public void setMaxStudents(Integer maxStudents) {
+        this.maxStudents = maxStudents;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 }

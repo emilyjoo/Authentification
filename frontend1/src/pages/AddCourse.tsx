@@ -263,7 +263,7 @@ const AddCourse: React.FC = () => {
                                                 <SelectItem key={instructor.id} value={instructor.id.toString()}>
                                                     <div className="flex items-center gap-2">
                                                         <Users className="h-4 w-4 text-muted-foreground" />
-                                                        <span>{instructor.name}</span>
+                                                        <span>{instructor.id}</span>
                                                         {/* Optional: Add email or other info if available in `instructor` */}
                                                     </div>
                                                 </SelectItem>

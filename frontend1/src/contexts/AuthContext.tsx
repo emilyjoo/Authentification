@@ -11,6 +11,7 @@ interface User {
   email: string;
   username: string;
   roles?: Role[];
+  instructorId?: number; // Optional, only for instructors
 }
 
 interface AuthContextType {
@@ -134,6 +135,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           email: data.email,
           username: data.username,
           roles: data.roles,
+          instructorId: data.instructorId
         };
 
         console.log('User data to store:', userData);

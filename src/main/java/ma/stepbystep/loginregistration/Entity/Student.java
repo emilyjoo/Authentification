@@ -28,6 +28,7 @@ public class Student {
     @Pattern(regexp = "^[a-zA-Z\\s]*$", message = "Name can only contain letters and spaces")
     private String name;
 
+
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
     private Set<Enrollment> enrollments;
 
@@ -37,7 +38,23 @@ public class Student {
             joinColumns = @JoinColumn(name = "student_id"),
             inverseJoinColumns = @JoinColumn(name = "course_id")
     )
+
     private Set<Course> courses;
+
+    @OneToOne  // Or @ManyToOne if multiple students can link to one user
+    @JoinColumn(name = "user_id")  // Must match the DB column name
+    private AppUser user;
+
+    // Getters and Setters
+
+
+    public AppUser getUser() {
+        return user;
+    }
+
+    public void setUser(AppUser user) {
+        this.user = user;
+    }
 
     public Long getId() {
         return id;

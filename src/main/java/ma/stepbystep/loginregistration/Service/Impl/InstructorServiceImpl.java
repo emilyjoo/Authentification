@@ -67,4 +67,16 @@ public class InstructorServiceImpl implements InstructorService {
         return instructorRepository.findById(id)
                 .orElseThrow(() -> new InstructorNotFoundException(id));
     }
+
+    @Override
+    public boolean instructorExistsByUserId(Long userId) {
+        return instructorRepository.existsByUser_Id(userId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Instructor getInstructorByUserId(Long userId) {
+        return instructorRepository.findByUser_Id(userId)
+                .orElseThrow(() -> new InstructorNotFoundException("No instructor found for user ID: " + userId));
+    }
 }

@@ -1,5 +1,6 @@
 package ma.stepbystep.loginregistration.Service;
 
+import ma.stepbystep.loginregistration.Dto.CourseResponseDTO;
 import ma.stepbystep.loginregistration.Entity.Course;
 
 import java.util.List;
@@ -11,4 +12,5 @@ public interface CourseService {
     List<Course> getAllCourses();
     Course getCourseById(Long id);
     List<Course> getCoursesByInstructorId(Long instructorId);
+    List<CourseResponseDTO> getCoursesForDisplay();
 }
