@@ -11,6 +11,7 @@ public interface InstructorService {
     Instructor getInstructorById(Long id);
     boolean instructorExistsByUserId(Long userId);
     Instructor getInstructorByUserId(Long userId);
+    public Instructor findByUserId(Long userId);
 
 
 }

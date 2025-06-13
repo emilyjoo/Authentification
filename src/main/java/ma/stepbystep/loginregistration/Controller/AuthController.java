@@ -163,7 +163,8 @@ public class AuthController {
 
             Student student = new Student();
             student.setEmail(user.getEmail());
-            student.setName(user.getUsername()); // Using username as name
+            student.setName(user.getUsername());
+            student.setUser(user);
 
             Student createdStudent = studentService.createStudent(student);
             System.out.println("Successfully created student record with ID: " + createdStudent.getId());

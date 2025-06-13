@@ -1,5 +1,7 @@
 package ma.stepbystep.loginregistration.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
@@ -18,11 +20,13 @@ public class Enrollment {
     @NotNull(message = "Student is mandatory")
     @ManyToOne
     @JoinColumn(name = "student_id", nullable = false)
+    @JsonBackReference(value = "student-enrollments")
     private Student student;
 
     @NotNull(message = "Course is mandatory")
     @ManyToOne
     @JoinColumn(name = "course_id", nullable = false)
+    @JsonBackReference(value = "course-enrollments")
     private Course course;
 
     @NotNull(message = "Enrollment date is mandatory")

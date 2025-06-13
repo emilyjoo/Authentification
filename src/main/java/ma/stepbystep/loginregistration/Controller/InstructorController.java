@@ -54,4 +54,11 @@ public class InstructorController {
     public ResponseEntity<Instructor> getInstructorById(@PathVariable Long id) {
         return ResponseEntity.ok(instructorService.getInstructorById(id));
     }
+
+    @GetMapping("/by-user/{userId}")
+    public ResponseEntity<Instructor> getInstructorByUserId(@PathVariable Long userId) {
+        Instructor instructor = instructorService.findByUserId(userId);
+        return ResponseEntity.ok(instructor);
+    }
+
 }

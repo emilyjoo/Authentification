@@ -1,6 +1,7 @@
 package ma.stepbystep.loginregistration.Service.Impl;
 
 
+import jakarta.persistence.EntityNotFoundException;
 import ma.stepbystep.loginregistration.Entity.Instructor;
 import ma.stepbystep.loginregistration.exception.DuplicateEmailException;
 import ma.stepbystep.loginregistration.exception.InstructorNotFoundException;
@@ -78,5 +79,10 @@ public class InstructorServiceImpl implements InstructorService {
     public Instructor getInstructorByUserId(Long userId) {
         return instructorRepository.findByUser_Id(userId)
                 .orElseThrow(() -> new InstructorNotFoundException("No instructor found for user ID: " + userId));
+    }
+
+    public Instructor findByUserId(Long userId) {
+        return instructorRepository.findByUserId(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Instructor not found"));
     }
 }

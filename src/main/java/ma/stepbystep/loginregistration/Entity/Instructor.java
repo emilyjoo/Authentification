@@ -1,5 +1,6 @@
 package ma.stepbystep.loginregistration.Entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -7,6 +8,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -34,11 +36,13 @@ public class Instructor {
     private String specialization;
 
     @OneToMany(mappedBy = "instructor", cascade = CascadeType.ALL)
+    @JsonManagedReference(value = "instructor-courses")
     private Set<Course> courses;
 
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     private AppUser user;
+
 
     public Long getId() {
         return id;

@@ -1,9 +1,6 @@
 package ma.stepbystep.loginregistration.Service.Impl;
 
-import ma.stepbystep.loginregistration.Dto.CourseDTO;
-import ma.stepbystep.loginregistration.Dto.CourseResponseDTO;
-import ma.stepbystep.loginregistration.Dto.InstructorDTO;
-import ma.stepbystep.loginregistration.Dto.InstructorResponseDTO;
+import ma.stepbystep.loginregistration.Dto.*;
 import ma.stepbystep.loginregistration.Entity.Course;
 import ma.stepbystep.loginregistration.Repo.CourseRepository;
 import ma.stepbystep.loginregistration.Service.CourseService;
@@ -12,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -156,6 +154,77 @@ public class CourseServiceImpl implements CourseService {
             System.err.println("Error retrieving courses for instructor ID " + instructorId + ": " + e.getMessage());
             e.printStackTrace();
             throw e;
+        }
+    }
+
+    public List<Course> findByInstructor_Id(Long instructorId) {
+        return courseRepository.findByInstructorId(instructorId);
+    }
+
+    public List<InstructorCourseDTO> getCoursesDTOByInstructorId(Long instructorId) {
+        System.out.println("Fetching courses DTOs for instructor ID: " + instructorId);
+        return courseRepository.findCourseDTOsByInstructorId(instructorId);
+    }
+
+    public List<InstructorCourseDTO> getCoursesWithEnrollmentsByInstructorId(Long instructorId) {
+        System.out.println("Fetching courses with enrollments for instructor ID: " + instructorId);
+
+        List<Course> courses = courseRepository.findByInstructorIdWithEnrollments(instructorId);
+
+        return courses.stream().map(course -> {
+            InstructorCourseDTO dto = new InstructorCourseDTO();
+            dto.setId(course.getId());
+            dto.setName(course.getName());
+            dto.setDescription(course.getDescription());
+            dto.setStartDate(course.getStartDate() != null ? course.getStartDate().toString() : null);
+            dto.setEndDate(course.getEndDate() != null ? course.getEndDate().toString() : null);
+
+            // Safe enrollment count - no lazy loading issues
+            dto.setEnrollmentCount(course.getEnrollments() != null ? course.getEnrollments().size() : 0);
+
+            // Calculate status
+            dto.setStatus(calculateCourseStatus(course.getStartDate(), course.getEndDate()));
+
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+    public List<InstructorCourseDTO> getCoursesWithSeparateCountByInstructorId(Long instructorId) {
+        System.out.println("Fetching courses with separate count queries for instructor ID: " + instructorId);
+
+        List<Course> courses = courseRepository.findByInstructorId(instructorId);
+
+        return courses.stream().map(course -> {
+            InstructorCourseDTO dto = new InstructorCourseDTO();
+            dto.setId(course.getId());
+            dto.setName(course.getName());
+            dto.setDescription(course.getDescription());
+            dto.setStartDate(course.getStartDate() != null ? course.getStartDate().toString() : null);
+            dto.setEndDate(course.getEndDate() != null ? course.getEndDate().toString() : null);
+
+            // Use separate count query
+            Long count = courseRepository.countEnrollmentsByCourseId(course.getId());
+            dto.setEnrollmentCount(count != null ? count.intValue() : 0);
+
+            // Calculate status
+            dto.setStatus(calculateCourseStatus(course.getStartDate(), course.getEndDate()));
+
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+    private String calculateCourseStatus(LocalDate startDate, LocalDate endDate) {
+        if (startDate == null || endDate == null) {
+            return "active";
+        }
+
+        LocalDate today = LocalDate.now();
+        if (today.isBefore(startDate)) {
+            return "upcoming";
+        } else if (today.isAfter(endDate)) {
+            return "completed";
+        } else {
+            return "active";
         }
     }
 }

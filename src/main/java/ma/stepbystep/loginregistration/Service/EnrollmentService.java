@@ -20,4 +20,5 @@ public interface EnrollmentService {
     List<Enrollment> getAllEnrollments();
 
     public Enrollment enrollStudent(Long studentId, Long courseId, LocalDate enrollmentDate);
+    public int countByCourseId(Long courseId);
 }

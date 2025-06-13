@@ -1,5 +1,6 @@
 package ma.stepbystep.loginregistration.Entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -30,6 +31,7 @@ public class Student {
 
 
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
+    @JsonManagedReference(value = "student-enrollments")
     private Set<Enrollment> enrollments;
 
     @ManyToMany

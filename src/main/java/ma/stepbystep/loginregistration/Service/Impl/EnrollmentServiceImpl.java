@@ -94,4 +94,8 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 
         return enrollmentRepository.save(enrollment);
     }
+
+    public int countByCourseId(Long courseId) {
+        return enrollmentRepository.countByCourseId(courseId);
+    }
 }

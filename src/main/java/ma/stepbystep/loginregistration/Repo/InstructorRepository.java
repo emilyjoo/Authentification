@@ -18,4 +18,5 @@ public interface InstructorRepository extends JpaRepository<Instructor, Long> {
     boolean existsByEmail(String email);
     boolean existsByUser_Id(Long userId);
     Optional<Instructor> findByUser_Id(Long userId);
+    Optional<Instructor> findByUserId(Long userId);
 }
