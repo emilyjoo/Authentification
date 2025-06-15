@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class InstructorServiceImpl implements InstructorService {
@@ -75,10 +76,21 @@ public class InstructorServiceImpl implements InstructorService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Instructor getInstructorByUserId(Long userId) {
-        return instructorRepository.findByUser_Id(userId)
-                .orElseThrow(() -> new InstructorNotFoundException("No instructor found for user ID: " + userId));
+        try {
+            Optional<Instructor> instructor = instructorRepository.findByUserId(userId);
+            if (instructor.isPresent()) {
+                System.out.println("Found instructor by user ID " + userId + ": " + instructor.get().getName());
+                return instructor.get();
+            } else {
+                System.out.println("No instructor found for user ID: " + userId);
+                return null;
+            }
+        } catch (Exception e) {
+            System.err.println("Error finding instructor by user ID " + userId + ": " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public Instructor findByUserId(Long userId) {

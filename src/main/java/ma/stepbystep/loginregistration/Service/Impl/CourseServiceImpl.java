@@ -42,15 +42,58 @@ public class CourseServiceImpl implements CourseService {
             Course existingCourse = courseRepository.findById(id)
                     .orElseThrow(() -> new CourseNotFoundException(id));
 
-            // Update all fields
-            existingCourse.setName(course.getName());
-            existingCourse.setDescription(course.getDescription());
-            existingCourse.setStartDate(course.getStartDate());
-            existingCourse.setEndDate(course.getEndDate());
-            existingCourse.setMaxStudents(course.getMaxStudents());
-            existingCourse.setPrice(course.getPrice());
-            existingCourse.setCategory(course.getCategory());
-            existingCourse.setInstructor(course.getInstructor());
+            // Update fields only if they're not null
+            if (course.getName() != null) {
+                existingCourse.setName(course.getName());
+            }
+            if (course.getDescription() != null) {
+                existingCourse.setDescription(course.getDescription());
+            }
+            if (course.getStartDate() != null) {
+                existingCourse.setStartDate(course.getStartDate());
+            }
+            if (course.getEndDate() != null) {
+                existingCourse.setEndDate(course.getEndDate());
+            }
+            if (course.getMaxStudents() != null) {
+                existingCourse.setMaxStudents(course.getMaxStudents());
+            }
+            if (course.getPrice() != null) {
+                existingCourse.setPrice(course.getPrice());
+            }
+            if (course.getCategory() != null) {
+                existingCourse.setCategory(course.getCategory());
+            }
+            // Don't update instructor unless specifically provided
+            if (course.getInstructor() != null) {
+                existingCourse.setInstructor(course.getInstructor());
+            }
+
+            return courseRepository.save(existingCourse);
+        } catch (Exception e) {
+            System.err.println("Error updating course with ID " + id + ": " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    @Override
+    @Transactional
+    public Course updateCourse(Long id, CourseUpdateDTO courseDTO) {
+        try {
+            Course existingCourse = courseRepository.findById(id)
+                    .orElseThrow(() -> new CourseNotFoundException(id));
+
+            // Update fields from DTO
+            existingCourse.setName(courseDTO.getName());
+            existingCourse.setDescription(courseDTO.getDescription());
+            existingCourse.setStartDate(courseDTO.getStartDate());
+            existingCourse.setEndDate(courseDTO.getEndDate());
+//            existingCourse.setMaxStudents(courseDTO.getMaxStudents());
+//            existingCourse.setPrice(courseDTO.getPrice());
+//            existingCourse.setCategory(courseDTO.getCategory());
+
+            // Don't update instructor - keep existing
 
             return courseRepository.save(existingCourse);
         } catch (Exception e) {
@@ -171,20 +214,21 @@ public class CourseServiceImpl implements CourseService {
 
         List<Course> courses = courseRepository.findByInstructorIdWithEnrollments(instructorId);
 
-        return courses.stream().map(course -> {
+            return courses.stream().map(course -> {
             InstructorCourseDTO dto = new InstructorCourseDTO();
             dto.setId(course.getId());
             dto.setName(course.getName());
             dto.setDescription(course.getDescription());
             dto.setStartDate(course.getStartDate() != null ? course.getStartDate().toString() : null);
             dto.setEndDate(course.getEndDate() != null ? course.getEndDate().toString() : null);
-
-            // Safe enrollment count - no lazy loading issues
             dto.setEnrollmentCount(course.getEnrollments() != null ? course.getEnrollments().size() : 0);
 
-            // Calculate status
-            dto.setStatus(calculateCourseStatus(course.getStartDate(), course.getEndDate()));
+            // Add the missing fields:
+            dto.setCategory(course.getCategory());
+            dto.setMaxStudents(course.getMaxStudents());
+            dto.setPrice(course.getPrice());
 
+            dto.setStatus(calculateCourseStatus(course.getStartDate(), course.getEndDate()));
             return dto;
         }).collect(Collectors.toList());
     }
@@ -194,7 +238,7 @@ public class CourseServiceImpl implements CourseService {
 
         List<Course> courses = courseRepository.findByInstructorId(instructorId);
 
-        return courses.stream().map(course -> {
+            return courses.stream().map(course -> {
             InstructorCourseDTO dto = new InstructorCourseDTO();
             dto.setId(course.getId());
             dto.setName(course.getName());
@@ -206,9 +250,12 @@ public class CourseServiceImpl implements CourseService {
             Long count = courseRepository.countEnrollmentsByCourseId(course.getId());
             dto.setEnrollmentCount(count != null ? count.intValue() : 0);
 
-            // Calculate status
-            dto.setStatus(calculateCourseStatus(course.getStartDate(), course.getEndDate()));
+            // Add the missing fields:
+            dto.setCategory(course.getCategory());
+            dto.setMaxStudents(course.getMaxStudents());
+            dto.setPrice(course.getPrice());
 
+            dto.setStatus(calculateCourseStatus(course.getStartDate(), course.getEndDate()));
             return dto;
         }).collect(Collectors.toList());
     }

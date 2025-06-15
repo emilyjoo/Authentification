@@ -1,6 +1,7 @@
 package ma.stepbystep.loginregistration.Service;
 
 import ma.stepbystep.loginregistration.Dto.CourseResponseDTO;
+import ma.stepbystep.loginregistration.Dto.CourseUpdateDTO;
 import ma.stepbystep.loginregistration.Dto.InstructorCourseDTO;
 import ma.stepbystep.loginregistration.Entity.Course;
 import org.springframework.data.jpa.repository.Query;
@@ -11,6 +12,7 @@ import java.util.List;
 public interface CourseService {
     Course createCourse(Course course);
     Course updateCourse(Long id, Course course);
+    public Course updateCourse(Long id, CourseUpdateDTO courseDTO);
     void deleteCourse(Long id);
     List<Course> getAllCourses();
     Course getCourseById(Long id);

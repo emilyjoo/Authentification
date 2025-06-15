@@ -17,6 +17,7 @@ import StudentDashboard from "./pages/StudentDashboard";
 import InstructorDashboard from "./pages/InstructorDashboard";
 import NotFound from "./pages/NotFound";
 import AddInstructor from "./pages/AddInstructor";
+import {Layout} from "./pages/Layout";
 
 const queryClient = new QueryClient();
 
@@ -56,6 +57,12 @@ const App = () => (
                                   <InstructorDashboard />
                               </RoleProtectedRoute>
                           </ProtectedRoute>
+                      }
+                  />
+                  <Route
+                      path="/layout"
+                      element={
+                          <Layout />
                       }
                   />
                   <Route

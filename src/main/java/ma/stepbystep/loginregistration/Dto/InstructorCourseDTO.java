@@ -15,23 +15,31 @@ public class InstructorCourseDTO {
     private String endDate;
     private int enrollmentCount;
     private String status;
+    private String category;
+    private Integer maxStudents;
+    private Double price;
 
     // Default constructor (required for JPA)
     public InstructorCourseDTO() {}
 
     // Constructor for JPQL projection - MUST match the query parameters exactly
     public InstructorCourseDTO(Long id, String name, String description,
-                               LocalDate startDate, LocalDate endDate, Long enrollmentCount) {
+                                                       LocalDate startDate, LocalDate endDate, Long enrollmentCount,
+                                                       String category, Integer maxStudents, Double price) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.startDate = startDate != null ? startDate.toString() : null;
         this.endDate = endDate != null ? endDate.toString() : null;
         this.enrollmentCount = enrollmentCount != null ? enrollmentCount.intValue() : 0;
+        this.category = category;
+        this.maxStudents = maxStudents;
+        this.price = price;
         this.status = calculateStatus(startDate, endDate);
     }
 
     // Alternative constructor with String dates (if needed)
+
     public InstructorCourseDTO(Long id, String name, String description,
                                String startDate, String endDate, Long enrollmentCount) {
         this.id = id;
@@ -121,4 +129,14 @@ public class InstructorCourseDTO {
                 ", status='" + status + '\'' +
                 '}';
     }
+
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
+
+    public Integer getMaxStudents() { return maxStudents; }
+    public void setMaxStudents(Integer maxStudents) { this.maxStudents = maxStudents; }
+
+    public Double getPrice() { return price; }
+    public void setPrice(Double price) { this.price = price; }
+
 }

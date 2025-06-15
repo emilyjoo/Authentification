@@ -30,6 +30,8 @@ interface CourseFormData {
 interface Instructor {
     id: string;
     name: string;
+    email: string;
+    specialization: string;
 }
 
 const AddCourse: React.FC = () => {
@@ -38,6 +40,7 @@ const AddCourse: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [instructors, setInstructors] = useState<Instructor[]>([]);
     const [isFetchingInstructors, setIsFetchingInstructors] = useState(false);
+    const [currentInstructor, setCurrentInstructor] = useState<Instructor | null>(null);
     const { user, token, isAdmin, isInstructor } = useAuth();
 
     const [formData, setFormData] = useState<CourseFormData>({
@@ -54,12 +57,45 @@ const AddCourse: React.FC = () => {
     // Set instructorId automatically for instructors
     useEffect(() => {
         if (isInstructor() && user?.userId) {
-            setFormData(prev => ({
-                ...prev,
-                instructorId: user.userId.toString()
-            }));
+            fetchCurrentInstructor(user.userId);
         }
     }, [user, isInstructor]);
+
+    // Fetch current instructor's data for logged-in instructors
+    const fetchCurrentInstructor = async (userId: number) => {
+        try {
+            const response = await fetch(`http://localhost:8085/api/instructors/by-user/${userId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                const instructor = await response.json();
+                setCurrentInstructor(instructor);
+                setFormData(prev => ({
+                    ...prev,
+                    instructorId: instructor.id.toString()
+                }));
+            } else {
+                console.error('Failed to fetch current instructor');
+                toast({
+                    title: "Error",
+                    description: "Could not load instructor information",
+                    variant: "destructive"
+                });
+            }
+        } catch (error) {
+            console.error('Error fetching current instructor:', error);
+            toast({
+                title: "Error",
+                description: "Could not load instructor information",
+                variant: "destructive"
+            });
+        }
+    };
 
     // Fetch instructors only if user is admin
     useEffect(() => {
@@ -71,7 +107,8 @@ const AddCourse: React.FC = () => {
     const fetchInstructors = async () => {
         setIsFetchingInstructors(true);
         try {
-            const response = await fetch('http://localhost:8085/api/users/instructors', {
+            // Fixed endpoint URL
+            const response = await fetch('http://localhost:8085/api/instructors', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -84,6 +121,7 @@ const AddCourse: React.FC = () => {
             }
 
             const data = await response.json();
+            console.log('Fetched instructors:', data); // Debug log
             setInstructors(data);
         } catch (error) {
             console.error('Error fetching instructors:', error);
@@ -174,7 +212,7 @@ const AddCourse: React.FC = () => {
                     maxStudents: 0,
                     price: 0,
                     category: '',
-                    instructorId: isInstructor() ? (user?.userId?.toString() || '') : ''
+                    instructorId: isInstructor() ? (currentInstructor?.id?.toString() || '') : ''
                 });
 
                 // Navigate based on user role
@@ -263,8 +301,11 @@ const AddCourse: React.FC = () => {
                                                 <SelectItem key={instructor.id} value={instructor.id.toString()}>
                                                     <div className="flex items-center gap-2">
                                                         <Users className="h-4 w-4 text-muted-foreground" />
-                                                        <span>{instructor.id}</span>
-                                                        {/* Optional: Add email or other info if available in `instructor` */}
+                                                        {/* Fixed to show instructor name instead of ID */}
+                                                        <div className="flex flex-col">
+                                                            <span className="font-medium">{instructor.name}</span>
+                                                            <span className="text-xs text-muted-foreground">{instructor.specialization}</span>
+                                                        </div>
                                                     </div>
                                                 </SelectItem>
                                             ))}
@@ -277,7 +318,7 @@ const AddCourse: React.FC = () => {
                             )}
 
                             {/* Show instructor info for logged-in instructors */}
-                            {isInstructor() && (
+                            {isInstructor() && currentInstructor && (
                                 <div className="space-y-2">
                                     <Label className="flex items-center space-x-1">
                                         <User className="h-4 w-4" />
@@ -285,7 +326,10 @@ const AddCourse: React.FC = () => {
                                     </Label>
                                     <div className="p-3 bg-blue-50 rounded-md border">
                                         <p className="text-sm text-blue-800">
-                                            This course will be assigned to: <strong>{user?.username}</strong>
+                                            This course will be assigned to: <strong>{currentInstructor.name}</strong>
+                                        </p>
+                                        <p className="text-xs text-blue-600 mt-1">
+                                            Specialization: {currentInstructor.specialization}
                                         </p>
                                     </div>
                                 </div>

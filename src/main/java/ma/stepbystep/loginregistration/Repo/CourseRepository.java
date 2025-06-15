@@ -34,9 +34,12 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
 
     // Direct DTO projection query (most efficient for dashboard)
     @Query("SELECT new ma.stepbystep.loginregistration.Dto.InstructorCourseDTO(" +
-            "c.id, c.name, c.description, c.startDate, c.endDate, COUNT(e)) " +
+            "c.id, c.name, c.description, c.startDate, c.endDate, COUNT(e), " +
+            "c.category, c.maxStudents, c.price) " +
             "FROM Course c LEFT JOIN c.enrollments e " +
             "WHERE c.instructor.id = :instructorId " +
-            "GROUP BY c.id, c.name, c.description, c.startDate, c.endDate")
+            "GROUP BY c.id, c.name, c.description, c.startDate, c.endDate, " +
+            "c.category, c.maxStudents, c.price")
     List<InstructorCourseDTO> findCourseDTOsByInstructorId(@Param("instructorId") Long instructorId);
+
 }

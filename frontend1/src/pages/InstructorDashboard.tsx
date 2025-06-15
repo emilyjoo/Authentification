@@ -12,6 +12,9 @@ interface InstructorCourse {
     endDate: string;
     enrollmentCount: number;
     status: 'active' | 'completed' | 'upcoming';
+    category: string;
+    price: number;
+    maxStudents: number;
 }
 
 interface Student {
@@ -148,17 +151,34 @@ const InstructorDashboard: React.FC = () => {
     // Update course mutation
     const updateCourseMutation = useMutation({
         mutationFn: async (course: InstructorCourse) => {
+            // Prepare the course data with all attributes
+            const courseData = {
+                id: course.id,
+                name: course.name,
+                description: course.description,
+                startDate: course.startDate,
+                endDate: course.endDate,
+                category: course.category,
+                price: course.price,
+                maxStudents: course.maxStudents,
+                status: course.status
+            };
+
+            console.log("Updating course with data:", courseData);
+
             const response = await fetch(`http://localhost:8085/api/courses/${course.id}`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(course),
+                body: JSON.stringify(courseData),
             });
 
             if (!response.ok) {
-                throw new Error('Failed to update course');
+                const errorText = await response.text();
+                console.error("Course update error:", errorText);
+                throw new Error(`Failed to update course: ${response.status} - ${errorText}`);
             }
 
             return response.json();
@@ -172,6 +192,7 @@ const InstructorDashboard: React.FC = () => {
             setEditingCourse(null);
         },
         onError: (error: Error) => {
+            console.error("Update course mutation error:", error);
             toast({
                 title: "Error",
                 description: error.message,
@@ -192,7 +213,9 @@ const InstructorDashboard: React.FC = () => {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to delete course');
+                const errorText = await response.text();
+                console.error("Course delete error:", errorText);
+                throw new Error(`Failed to delete course: ${response.status} - ${errorText}`);
             }
         },
         onSuccess: () => {
@@ -204,6 +227,7 @@ const InstructorDashboard: React.FC = () => {
             setSelectedCourse(null);
         },
         onError: (error: Error) => {
+            console.error("Delete course mutation error:", error);
             toast({
                 title: "Error",
                 description: error.message,
@@ -242,6 +266,13 @@ const InstructorDashboard: React.FC = () => {
             month: 'short',
             day: 'numeric'
         });
+    };
+
+    const formatPrice = (price: number) => {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD'
+        }).format(price);
     };
 
     // Calculate stats
@@ -408,9 +439,11 @@ const InstructorDashboard: React.FC = () => {
                                                             </span>
                                                         </div>
                                                         <p className="text-sm text-gray-600 mb-3">{course.description}</p>
-                                                        <div className="flex items-center gap-4 text-sm text-gray-500">
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-500 mb-2">
                                                             <span>📅 {formatDate(course.startDate)} - {formatDate(course.endDate)}</span>
-                                                            <span>👥 {course.enrollmentCount} students</span>
+                                                            <span>👥 {course.enrollmentCount}/{course.maxStudents || 'Unlimited'} students</span>
+                                                            <span>🏷️ {course.category || 'Uncategorized'}</span>
+                                                            <span>💰 {formatPrice(course.price || 0)}</span>
                                                         </div>
                                                     </div>
                                                     <div className="flex gap-2">

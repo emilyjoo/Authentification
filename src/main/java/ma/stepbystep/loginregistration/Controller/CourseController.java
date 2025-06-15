@@ -1,9 +1,6 @@
 package ma.stepbystep.loginregistration.Controller;
 
-import ma.stepbystep.loginregistration.Dto.CourseDTO;
-import ma.stepbystep.loginregistration.Dto.CourseResponseDTO;
-import ma.stepbystep.loginregistration.Dto.InstructorCourseDTO;
-import ma.stepbystep.loginregistration.Dto.StudentDTO;
+import ma.stepbystep.loginregistration.Dto.*;
 import ma.stepbystep.loginregistration.Entity.Course;
 import ma.stepbystep.loginregistration.Entity.Enrollment;
 import ma.stepbystep.loginregistration.Entity.Instructor;
@@ -64,11 +61,17 @@ public class CourseController {
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateCourse(@PathVariable Long id, @Valid @RequestBody Course course, BindingResult result) {
+    public ResponseEntity<?> updateCourse(@PathVariable Long id, @Valid @RequestBody CourseUpdateDTO courseDTO, BindingResult result) {
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(result.getAllErrors());
         }
-        return ResponseEntity.ok(courseService.updateCourse(id, course));
+
+        try {
+            Course updatedCourse = courseService.updateCourse(id, courseDTO);
+            return ResponseEntity.ok(updatedCourse);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error updating course: " + e.getMessage());
+        }
     }
 
     @DeleteMapping("/{id}")
@@ -184,8 +187,10 @@ public class CourseController {
                 dto.setEndDate(course.getEndDate() != null ? course.getEndDate().toString() : null);
 
                 // CHANGE THIS PART - Don't try to access enrollments directly
-                dto.setEnrollmentCount(0); // Set to 0 for now, or use a separate service call
-
+                dto.setEnrollmentCount(0);// Set to 0 for now, or use a separate service call
+                dto.setCategory(course.getCategory());
+                dto.setMaxStudents(course.getMaxStudents());
+                dto.setPrice(course.getPrice());
                 // Set status based on dates
                 LocalDate today = LocalDate.now();
                 if (course.getStartDate() != null && course.getEndDate() != null) {
