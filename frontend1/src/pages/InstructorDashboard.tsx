@@ -3,6 +3,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import EditCourseModal from "@/components/instructor/EditCourseModal.tsx";
+import {Link} from "react-router-dom";
+import {Button} from "@/components/ui/button.tsx";
 
 interface InstructorCourse {
     id: number;
@@ -323,12 +325,15 @@ const InstructorDashboard: React.FC = () => {
                             <h1 className="text-2xl font-bold text-gray-900">Instructor Dashboard</h1>
                             <p className="mt-1 text-gray-600">Welcome back, {user?.username}!</p>
                         </div>
+                        <Link to="/add-course">
                         <button
                             onClick={() => setShowCreateModal(true)}
                             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
                         >
                             Create New Course
                         </button>
+                    </Link>
+
                     </div>
                 </div>
             </div>

@@ -20,10 +20,7 @@ interface EnrolledCourse {
 }
 
 // Mock auth context for demo
-const useAuth = () => ({
-    user: { userId: 25, username: 'john_doe' },
-    token: 'mock-token'
-});
+import { useAuth } from '@/contexts/AuthContext';
 
 const StudentDashboard: React.FC = () => {
     const { user, token } = useAuth();
@@ -395,16 +392,16 @@ const StudentDashboard: React.FC = () => {
                                                 </span>
                                             </div>
                                             <Link to="/course-viewer">
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                className="hover:bg-blue-50 hover:border-blue-200"
-                                            >
-                                                {course.status === 'upcoming' ? 'View Details' :
-                                                    course.status === 'completed' ? 'View Certificate' :
-                                                        'Start Learning'}
-                                            </Button>
-                                        </Link>
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="hover:bg-blue-50 hover:border-blue-200"
+                                                >
+                                                    {course.status === 'upcoming' ? 'View Details' :
+                                                        course.status === 'completed' ? 'View Certificate' :
+                                                            'Start Learning'}
+                                                </Button>
+                                            </Link>
                                         </div>
                                     </div>
                                 ))}

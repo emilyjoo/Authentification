@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class EnrollmentServiceImpl implements EnrollmentService {
@@ -81,6 +82,11 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     }
 
     public Enrollment enrollStudent(Long studentId, Long courseId, LocalDate enrollmentDate) {
+        Optional<Enrollment> existingEnrollment = enrollmentRepository.findByStudentIdAndCourseId(studentId, courseId);
+
+        if (existingEnrollment.isPresent()) {
+            throw new IllegalStateException("Student is already enrolled in this course");
+        }
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new RuntimeException("Student not found"));
 

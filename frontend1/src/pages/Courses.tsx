@@ -140,9 +140,15 @@ const Courses: React.FC = () => {
             queryClient.invalidateQueries({ queryKey: ['courses'] });
         },
         onError: (error: Error) => {
+            const msg = error.message?.toLowerCase() || "";
+
+            const isAlreadyEnrolled = msg.includes("already enrolled");
+
             toast({
-                title: "Error",
-                description: error.message || "Failed to enroll in course",
+                title: isAlreadyEnrolled ? "Enrollment Info" : "Enrollment Error",
+                description: isAlreadyEnrolled
+                    ? "You are already enrolled in this course."
+                    : error.message || "Failed to enroll in course.",
                 variant: "destructive",
             });
         },

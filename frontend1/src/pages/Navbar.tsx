@@ -11,38 +11,19 @@ import {
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Search, Book, User, LogOut, Settings } from "lucide-react";
-import { useState, useEffect } from "react";
-
-interface User {
-    name: string;
-    email: string;
-    avatar?: string;
-    role: 'student' | 'instructor' | 'admin';
-}
+import { useState } from "react";
+import { useAuth } from "../contexts/AuthContext"; // Import your AuthContext
 
 export const Navbar = () => {
     const [searchOpen, setSearchOpen] = useState(false);
-    const [user, setUser] = useState<User | null>(null);
     const navigate = useNavigate();
 
-    // Vérifier si l'utilisateur est connecté au chargement
-    useEffect(() => {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-            try {
-                setUser(JSON.parse(storedUser));
-            } catch (error) {
-                console.error("Erreur lors de la lecture des données utilisateur:", error);
-                localStorage.removeItem('user');
-            }
-        }
-    }, []);
+    // Use your AuthContext instead of localStorage
+    const { user, logout } = useAuth();
 
     const handleSignOut = () => {
         console.log("Déconnexion...");
-        localStorage.removeItem('user');
-        localStorage.removeItem('token');
-        setUser(null);
+        logout(); // Use your AuthContext logout function
         navigate("/");
     };
 
@@ -51,32 +32,35 @@ export const Navbar = () => {
             <div className="container flex h-16 items-center justify-between">
                 <div className="flex items-center gap-6 md:gap-10">
                     <Link to="/" className="flex items-center space-x-2">
-                        <span className="inline-block font-bold text-xl md:text-2xl text-skillspark-600">
+                        <span className="inline-block font-bold text-xl md:text-2xl text-blue-600">
                             StepByStep
                         </span>
                     </Link>
                     <nav className="hidden md:flex gap-6">
-                        <Link to="/" className="text-sm font-medium transition-colors hover:text-skillspark-500">
+                        <Link to="/" className="text-sm font-medium transition-colors hover:text-blue-500">
                             Home
                         </Link>
-                        <Link to="/courses" className="text-sm font-medium transition-colors hover:text-skillspark-500">
+                        <Link to="/courses" className="text-sm font-medium transition-colors hover:text-blue-500">
                             Courses
                         </Link>
-                        <Link to="/instructors" className="text-sm font-medium transition-colors hover:text-skillspark-500">
-                            Instructors
-                        </Link>
-                        <Link to="/about" className="text-sm font-medium transition-colors hover:text-skillspark-500">
+                        <Link to="/about" className="text-sm font-medium transition-colors hover:text-blue-500">
                             About
                         </Link>
-                        {user?.role === 'instructor' && (
-                            <Link to="/instructor/courses" className="text-sm font-medium transition-colors hover:text-skillspark-500">
-                                My Courses
-                            </Link>
-                        )}
-                        {user?.role === 'admin' && (
-                            <Link to="/admin" className="text-sm font-medium transition-colors hover:text-skillspark-500">
-                                Admin
-                            </Link>
+                        <Link to="/contact" className="text-sm font-medium transition-colors hover:text-blue-500">
+                            Contact
+                        </Link>
+                        {user?.role === 'ADMIN' && (
+                            <>
+                                <Link to="/instructor-dashboard" className="text-sm font-medium transition-colors hover:text-blue-500">
+                                    Instructor Dashboard
+                                </Link>
+                                <Link to="/add-course" className="text-sm font-medium transition-colors hover:text-blue-500">
+                                    Add Course
+                                </Link>
+                                <Link to="/add-instructor" className="text-sm font-medium transition-colors hover:text-blue-500">
+                                    Add Instructor
+                                </Link>
+                            </>
                         )}
                     </nav>
                 </div>
@@ -120,10 +104,10 @@ export const Navbar = () => {
                                     <Avatar className="h-9 w-9">
                                         <AvatarImage
                                             src={user.avatar}
-                                            alt={user.name}
+                                            alt={user.username || user.email}
                                         />
                                         <AvatarFallback>
-                                            {user.name.charAt(0).toUpperCase()}
+                                            {(user.username || user.email).charAt(0).toUpperCase()}
                                         </AvatarFallback>
                                     </Avatar>
                                 </Button>
@@ -132,7 +116,7 @@ export const Navbar = () => {
                                 <DropdownMenuLabel>
                                     <div className="flex flex-col space-y-1">
                                         <p className="text-sm font-medium leading-none">
-                                            {user.name}
+                                            {user.username || user.email}
                                         </p>
                                         <p className="text-xs leading-none text-muted-foreground">
                                             {user.email}
@@ -144,6 +128,11 @@ export const Navbar = () => {
                                 <DropdownMenuItem onClick={() => navigate('/dashboard')}>
                                     <Book className="h-4 w-4 mr-2" />
                                     Dashboard
+                                </DropdownMenuItem>
+
+                                <DropdownMenuItem onClick={() => navigate('/student-dashboard')}>
+                                    <Book className="h-4 w-4 mr-2" />
+                                    My Learning
                                 </DropdownMenuItem>
 
                                 <DropdownMenuItem onClick={() => navigate('/profile')}>
@@ -171,14 +160,14 @@ export const Navbar = () => {
                         <div className="flex items-center gap-2">
                             <Button
                                 variant="outline"
-                                className="hover:bg-skillspark-50 hover:text-skillspark-600 hover:border-skillspark-300"
-                                onClick={() => navigate('/auth/login')}
+                                className="hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300"
+                                onClick={() => navigate('/auth')}
                             >
                                 Login
                             </Button>
                             <Button
-                                className="bg-skillspark-500 hover:bg-skillspark-600 text-white"
-                                onClick={() => navigate('/auth/signup')}
+                                className="bg-blue-500 hover:bg-blue-600 text-white"
+                                onClick={() => navigate('/auth')}
                             >
                                 Sign Up
                             </Button>

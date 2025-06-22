@@ -44,20 +44,25 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
             console.log('Parsed user data:', userData);
             console.log('User roles:', userData.roles);
 
-            // Check user role and redirect accordingly
-            // Note: Your backend uses 'roleName' field, not 'name'
             const isAdmin = userData.roles?.some((role: any) => {
-              console.log('Checking role:', role);
-              // Check for different possible role name formats
-              return role.roleName === 'ADMIN' ||
-                  role.roleName === 'admin' ||
-                  role.name === 'ADMIN' ||
-                  role.name === 'admin';
+              console.log('Checking role for admin:', role);
+              return role.roleName === 'ADMIN' || role.roleName === 'admin' ||
+                  role.name === 'ADMIN' || role.name === 'admin';
+            });
+
+            const isInstructor = userData.roles?.some((role: any) => {
+              console.log('Checking role for instructor:', role);
+              return role.roleName === 'INSTRUCTOR' || role.roleName === 'instructor' ||
+                  role.name === 'INSTRUCTOR' || role.name === 'instructor';
             });
 
             console.log('Is admin:', isAdmin);
+            console.log('Is instructor:', isInstructor);
 
             if (isAdmin) {
+              console.log('Redirecting to admin dashboard');
+              navigate('/admin-dashboard');
+            } else if (isInstructor) {
               console.log('Redirecting to instructor dashboard');
               navigate('/instructor-dashboard');
             } else {
@@ -66,14 +71,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
             }
           } catch (parseError) {
             console.error('Error parsing user data from localStorage:', parseError);
-            // Fallback - redirect to student dashboard if we can't parse the data
             navigate('/student-dashboard');
           }
         } else {
           console.warn('No user data found in localStorage');
-          // Fallback - redirect to student dashboard
           navigate('/student-dashboard');
         }
+
       } else {
         toast({
           variant: "destructive",
