@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
 import { Eye, EyeOff } from 'lucide-react';
+import {useNavigate} from "react-router-dom";
 
 interface Role {
   id: number;
@@ -69,6 +70,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const navigate = useNavigate();
 
 
     console.log('Selected Role ID:', selectedRole);
@@ -136,6 +139,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
           title: "Success",
           description: "Account created successfully! You are now logged in.",
         });
+        navigate('/courses');
       } else {
         toast({
           variant: "destructive",

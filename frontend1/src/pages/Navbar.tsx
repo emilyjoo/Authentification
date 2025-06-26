@@ -49,19 +49,11 @@ export const Navbar = () => {
                         <Link to="/contact" className="text-sm font-medium transition-colors hover:text-blue-500">
                             Contact
                         </Link>
-                        {user?.role === 'ADMIN' && (
+
                             <>
-                                <Link to="/instructor-dashboard" className="text-sm font-medium transition-colors hover:text-blue-500">
-                                    Instructor Dashboard
-                                </Link>
-                                <Link to="/add-course" className="text-sm font-medium transition-colors hover:text-blue-500">
-                                    Add Course
-                                </Link>
-                                <Link to="/add-instructor" className="text-sm font-medium transition-colors hover:text-blue-500">
-                                    Add Instructor
-                                </Link>
+
                             </>
-                        )}
+
                     </nav>
                 </div>
 
@@ -125,9 +117,9 @@ export const Navbar = () => {
                                 </DropdownMenuLabel>
                                 <DropdownMenuSeparator />
 
-                                <DropdownMenuItem onClick={() => navigate('/dashboard')}>
+                                <DropdownMenuItem onClick={() => navigate('/instructor-dashboard')}>
                                     <Book className="h-4 w-4 mr-2" />
-                                    Dashboard
+                                    Instructor Dashboard
                                 </DropdownMenuItem>
 
                                 <DropdownMenuItem onClick={() => navigate('/student-dashboard')}>
@@ -135,14 +127,14 @@ export const Navbar = () => {
                                     My Learning
                                 </DropdownMenuItem>
 
-                                <DropdownMenuItem onClick={() => navigate('/profile')}>
+                                <DropdownMenuItem onClick={() => navigate('/dashboard')}>
                                     <User className="h-4 w-4 mr-2" />
                                     Profile
                                 </DropdownMenuItem>
 
-                                <DropdownMenuItem onClick={() => navigate('/settings')}>
-                                    <Settings className="h-4 w-4 mr-2" />
-                                    Settings
+                                <DropdownMenuItem onClick={() => navigate('/add-instructor')}>
+                                    <User className="h-4 w-4 mr-2" />
+                                    Add Instructor
                                 </DropdownMenuItem>
 
                                 <DropdownMenuSeparator />

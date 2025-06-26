@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import RoleProtectedRoute from "./components/RoleProtectedRoute";
+import CourseManagement from "./pages/CourseManagement";
 // Import your Navbar component instead of Navigation
 import { Navbar } from "./pages/Navbar";
 import Index from "./pages/Index";
@@ -48,6 +49,16 @@ const App = () => (
                                 <ProtectedRoute>
                                     <Dashboard />
                                 </ProtectedRoute>
+                            }
+                        />
+                            <Route
+                                path="/course-management"
+                                element={
+                                    <ProtectedRoute>
+                                        <RoleProtectedRoute requiredRole="ADMIN" fallbackPath="/student-dashboard">
+                                        <CourseManagement />
+                                        </RoleProtectedRoute>
+                                    </ProtectedRoute>
                             }
                         />
 

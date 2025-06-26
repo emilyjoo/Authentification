@@ -49,6 +49,22 @@ public class Student {
 
     // Getters and Setters
 
+    public Student() {
+    }
+
+    public Student(Long id, String email, String name, Set<Enrollment> enrollments, Set<Course> courses, AppUser user) {
+        this.id = id;
+        this.email = email;
+        this.name = name;
+        this.enrollments = enrollments;
+        this.courses = courses;
+        this.user = user;
+    }
+
+    public Student(Long id) {
+        this.id = id;
+    }
+
 
     public AppUser getUser() {
         return user;

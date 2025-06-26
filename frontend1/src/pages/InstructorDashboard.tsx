@@ -5,6 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import EditCourseModal from "@/components/instructor/EditCourseModal.tsx";
 import {Link} from "react-router-dom";
 import {Button} from "@/components/ui/button.tsx";
+import {BookPlus, LogOut} from "lucide-react";
 
 interface InstructorCourse {
     id: number;
@@ -325,14 +326,23 @@ const InstructorDashboard: React.FC = () => {
                             <h1 className="text-2xl font-bold text-gray-900">Instructor Dashboard</h1>
                             <p className="mt-1 text-gray-600">Welcome back, {user?.username}!</p>
                         </div>
-                        <Link to="/add-course">
-                        <button
-                            onClick={() => setShowCreateModal(true)}
-                            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                        >
-                            Create New Course
-                        </button>
-                    </Link>
+                        <div className="flex space-x-2">
+                            <Link to="/add-course">
+                                <Button variant="outline">
+                                    <BookPlus className="h-4 w-4 mr-2"/>
+                                    Create New Course
+                                </Button>
+                            </Link>
+
+                            <Link to="/course-management">
+                                <Button variant="outline">
+                                    <BookPlus className="h-4 w-4 mr-2"/>
+                                    Course Management
+                                </Button>
+                            </Link>
+                        </div>
+
+
 
                     </div>
                 </div>
@@ -341,7 +351,7 @@ const InstructorDashboard: React.FC = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Stats Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                    <div className="bg-white rounded-lg shadow p-6">
+                <div className="bg-white rounded-lg shadow p-6">
                         <div className="flex items-center">
                             <div className="p-2 bg-blue-100 rounded-lg">
                                 <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

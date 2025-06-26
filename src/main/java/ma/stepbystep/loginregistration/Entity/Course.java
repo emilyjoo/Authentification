@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -58,6 +59,10 @@ public class Course {
     public Integer getEnrollmentCount() {
         return enrollments != null ? enrollments.size() : 0;
     }
+
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference(value = "course-lessons")
+    private List<Lesson> lessons;
 
     public Long getId() {
         return id;

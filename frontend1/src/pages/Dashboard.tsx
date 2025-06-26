@@ -3,8 +3,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { LogOut, User, Mail, RefreshCw, AlertCircle, Settings, UserCircle, Users, Award } from 'lucide-react';
-
+import { LogOut, User, Mail, RefreshCw, AlertCircle, Settings, UserCircle, Users, Award,BookPlus } from 'lucide-react';
+import { Link } from 'react-router-dom';
 interface Instructor {
   id: number;
   name: string;
@@ -101,13 +101,15 @@ const Dashboard: React.FC = () => {
               <h1 className="text-2xl font-bold text-gray-900">Profile Dashboard</h1>
               <div className="flex items-center space-x-3">
                 <Button variant="ghost" size="sm">
-                  <Settings className="h-4 w-4 mr-2" />
+                  <Settings className="h-4 w-4 mr-2"/>
                   Settings
                 </Button>
-                <Button onClick={handleLogout} variant="outline" size="sm">
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Logout
-                </Button>
+                <div className="flex space-x-2">
+                  <Button onClick={handleLogout} variant="outline">
+                    <LogOut className="h-4 w-4 mr-2"/>
+                    Logout
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
@@ -120,7 +122,7 @@ const Dashboard: React.FC = () => {
               <Card className="bg-white shadow-lg border-0">
                 <CardContent className="p-6">
                   <div className="text-center">
-                    {/* Profile Avatar */}
+                  {/* Profile Avatar */}
                     <div className="relative mx-auto w-24 h-24 mb-4">
                       <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
                         <UserCircle className="h-16 w-16 text-white" />

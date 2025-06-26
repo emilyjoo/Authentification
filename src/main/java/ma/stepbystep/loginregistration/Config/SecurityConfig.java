@@ -58,8 +58,10 @@ public class SecurityConfig {
                         .requestMatchers("/api/enrollments", "/api/enrollments/**").permitAll()
                         .requestMatchers("/api/enrollments/student", "/api/enrollments/student/**").permitAll()
                         .requestMatchers("/api/students", "/api/students/**").permitAll()
-                        .requestMatchers("/api/modules", "/api/modules/**").permitAll()
-                        .requestMatchers("/api/module-progress", "/api/module-progress/**").permitAll()
+                        .requestMatchers("/api/lessons", "/api/lessons/**").permitAll()
+                        .requestMatchers("/api/progress", "/api/progress/**").permitAll()
+                        .requestMatchers("/api/questions", "/api/questions/**").permitAll()
+                        .requestMatchers("/api/quizzes", "/api/quizzes/**").permitAll()
                         .requestMatchers("/api/students/user", "/api/students/user/**").permitAll()
                         .anyRequest().authenticated()
                 );
