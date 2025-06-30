@@ -15,6 +15,16 @@ public class StudentCourseDTO {
     private Integer maxStudents;
     private Double price;
 
+    private Long studentId;
+
+    public Long getStudentId() {
+        return studentId;
+    }
+
+    public void setStudentId(Long studentId) {
+        this.studentId = studentId;
+    }
+
     // Default constructor
     public StudentCourseDTO() {}
 

@@ -87,6 +87,6 @@ public class StudentServiceImpl implements StudentService {
 
     public Student findByUserId(Long userId) {
         return studentRepository.findByUser_Id(userId)
-                .orElseThrow(() -> new RuntimeException("Student with email " + userId + " not found"));
+                .orElseThrow(() -> new RuntimeException("Student with userId " + userId + " not found"));
     }
 }

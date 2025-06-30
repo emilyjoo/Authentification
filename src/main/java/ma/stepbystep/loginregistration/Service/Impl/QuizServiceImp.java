@@ -62,5 +62,23 @@ public class QuizServiceImp implements QuizService {
 
         return correct;
     }
+
+    public List<Quiz> getQuizzesByInstructorId(Long instructorId) {
+        try {
+            System.out.println("Fetching quizzes for instructor ID: " + instructorId);
+
+            // Using repository method to find quizzes by instructor ID
+            // This assumes you have a method in your QuizRepository
+            List<Quiz> quizzes = quizRepo.findByCourse_Instructor_Id(instructorId);
+
+            System.out.println("Found " + quizzes.size() + " quizzes for instructor " + instructorId);
+            return quizzes;
+
+        } catch (Exception e) {
+            System.err.println("Error fetching quizzes for instructor " + instructorId + ": " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Failed to fetch quizzes for instructor", e);
+        }
+    }
 }
 

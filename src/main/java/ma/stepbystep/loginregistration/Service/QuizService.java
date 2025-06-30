@@ -13,4 +13,5 @@ public interface QuizService {
     public Quiz create(Quiz quiz) ;
     public Quiz update(Long id, Quiz updated) ;
     public void delete(Long id) ;
+    public List<Quiz> getQuizzesByInstructorId(Long instructorId);
 }

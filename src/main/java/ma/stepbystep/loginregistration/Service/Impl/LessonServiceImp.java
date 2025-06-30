@@ -45,4 +45,23 @@ public class LessonServiceImp implements LessonService {
     public void delete(Long id) { lessonRepo.deleteById(id); }
 
 
+    public List<Lesson> getLessonsByInstructorId(Long instructorId) {
+        try {
+            System.out.println("Fetching lessons for instructor ID: " + instructorId);
+
+            // Using repository method to find lessons by instructor ID
+            // This assumes you have a method in your LessonRepository
+            List<Lesson> lessons = lessonRepo.findByCourse_Instructor_Id(instructorId);
+
+            System.out.println("Found " + lessons.size() + " lessons for instructor " + instructorId);
+            return lessons;
+
+        } catch (Exception e) {
+            System.err.println("Error fetching lessons for instructor " + instructorId + ": " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Failed to fetch lessons for instructor", e);
+        }
+    }
+
+
 }

@@ -7,6 +7,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import RoleProtectedRoute from "./components/RoleProtectedRoute";
 import CourseManagement from "./pages/CourseManagement";
+import ContentBrowser from "./pages/ContentBrowser";
 // Import your Navbar component instead of Navigation
 import { Navbar } from "./pages/Navbar";
 import Index from "./pages/Index";
@@ -41,6 +42,7 @@ const App = () => (
 
                     <Routes>
                         <Route path="/" element={<Layout />}>
+                            <Route path="/course-viewer/:courseId" element={<CourseViewer />} />
                         <Route path="/auth" element={<Auth />} />
                         <Route path="/courses" element={<Courses />} />
                         <Route
@@ -61,6 +63,14 @@ const App = () => (
                                     </ProtectedRoute>
                             }
                         />
+                            <Route
+                                path="/content-browser"
+                                element={
+                                    <ProtectedRoute>
+                                        <ContentBrowser />
+                                    </ProtectedRoute>
+                                }
+                            />
 
                             <Route index element={<HomePage />} />
                             <Route path="StudentSatisfactionHero" element={<StudentSatisfactionHero />} />

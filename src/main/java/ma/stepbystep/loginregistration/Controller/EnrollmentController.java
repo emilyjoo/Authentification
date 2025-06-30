@@ -98,6 +98,7 @@ public class EnrollmentController {
                         dto.setCategory(course.getCategory());
                         dto.setMaxStudents(course.getMaxStudents());
                         dto.setPrice(course.getPrice());
+                        dto.setStudentId(enrollment.getStudent().getId());
 
                         // Calculate status
                         LocalDate today = LocalDate.now();

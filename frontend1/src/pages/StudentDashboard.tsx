@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Book, Calendar, User, BookOpen, AlertCircle } from 'lucide-react';
+import {Book, Calendar, User, BookOpen, AlertCircle, Award} from 'lucide-react';
 import {Link} from "react-router-dom";
 
 interface EnrolledCourse {
@@ -21,6 +21,7 @@ interface EnrolledCourse {
 
 // Mock auth context for demo
 import { useAuth } from '@/contexts/AuthContext';
+import CertificateDialog from "@/components/CertificateDialog.tsx";
 
 const StudentDashboard: React.FC = () => {
     const { user, token } = useAuth();
@@ -28,6 +29,33 @@ const StudentDashboard: React.FC = () => {
     const [studentData, setStudentData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [certificateDialog, setCertificateDialog] = useState<{
+        isOpen: boolean;
+        courseName: string;
+        studentName: string;
+        completionDate: string;
+        instructor: string;
+    }>({
+        isOpen: false,
+        courseName: '',
+        studentName: '',
+        completionDate: '',
+        instructor: ''
+    });
+
+    const handleViewCertificate = (course: EnrolledCourse) => {
+        setCertificateDialog({
+            isOpen: true,
+            courseName: course.name,
+            studentName: studentData?.name || user?.username || 'Student',
+            completionDate: course.endDate,
+            instructor: course.instructor
+        });
+    };
+
+    const closeCertificateDialog = () => {
+        setCertificateDialog(prev => ({ ...prev, isOpen: false }));
+    };
 
     useEffect(() => {
         const fetchEnrolledCourses = async () => {
@@ -378,7 +406,20 @@ const StudentDashboard: React.FC = () => {
                                                     )}
                                                 </div>
                                             </div>
-                                            {getStatusBadge(course.status)}
+                                            <div className="flex items-center space-x-2">
+                                                {getStatusBadge(course.status)}
+                                                {course.status === 'completed' && (
+                                                    <Button
+                                                        onClick={() => handleViewCertificate(course)}
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="bg-yellow-50 border-yellow-200 text-yellow-700 hover:bg-yellow-100"
+                                                    >
+                                                        <Award className="h-4 w-4 mr-1" />
+                                                        Certificate
+                                                    </Button>
+                                                )}
+                                            </div>
                                         </div>
 
                                         <div className="flex justify-between items-center text-sm">
@@ -391,14 +432,14 @@ const StudentDashboard: React.FC = () => {
                                                     Enrolled: {formatDate(course.enrollmentDate)}
                                                 </span>
                                             </div>
-                                            <Link to="/course-viewer">
+                                            <Link to={`/course-viewer/${course.id}`}>
                                                 <Button
                                                     variant="outline"
                                                     size="sm"
                                                     className="hover:bg-blue-50 hover:border-blue-200"
                                                 >
                                                     {course.status === 'upcoming' ? 'View Details' :
-                                                        course.status === 'completed' ? 'View Certificate' :
+                                                        course.status === 'completed' ? 'Review Course' :
                                                             'Start Learning'}
                                                 </Button>
                                             </Link>
@@ -410,6 +451,16 @@ const StudentDashboard: React.FC = () => {
                     </CardContent>
                 </Card>
             </div>
+
+            {/* Certificate Dialog */}
+            <CertificateDialog
+                isOpen={certificateDialog.isOpen}
+                onClose={closeCertificateDialog}
+                courseName={certificateDialog.courseName}
+                studentName={certificateDialog.studentName}
+                completionDate={certificateDialog.completionDate}
+                instructor={certificateDialog.instructor}
+            />
         </div>
     );
 };

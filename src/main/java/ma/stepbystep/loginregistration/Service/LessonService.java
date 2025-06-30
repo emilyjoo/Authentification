@@ -11,4 +11,5 @@ public interface LessonService {
     public Lesson create(Lesson lesson);
     public Lesson update(Long id, Lesson updated);
     public void delete(Long id);
+    public List<Lesson> getLessonsByInstructorId(Long instructorId);
 }

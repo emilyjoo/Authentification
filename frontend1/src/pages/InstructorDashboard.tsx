@@ -340,6 +340,13 @@ const InstructorDashboard: React.FC = () => {
                                     Course Management
                                 </Button>
                             </Link>
+
+                            <Link to="/content-browser">
+                                <Button variant="outline">
+                                    <BookPlus className="h-4 w-4 mr-2"/>
+                                    Content Browser
+                                </Button>
+                            </Link>
                         </div>
 
 

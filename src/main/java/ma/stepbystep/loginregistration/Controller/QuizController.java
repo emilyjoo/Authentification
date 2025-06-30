@@ -69,5 +69,10 @@ public class QuizController {
         result.put("total", answers.size());
         return ResponseEntity.ok(result);
     }
+
+    @GetMapping("/instructor/{instructorId}")
+    public ResponseEntity<List<Quiz>> getQuizzesByInstructor(@PathVariable Long instructorId) {
+        return ResponseEntity.ok(quizService.getQuizzesByInstructorId(instructorId));
+    }
 }
 

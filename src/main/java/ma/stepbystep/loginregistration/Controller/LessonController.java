@@ -54,5 +54,10 @@ public class LessonController {
     public ResponseEntity<List<Lesson>> getLessons(@PathVariable Long courseId) {
         return ResponseEntity.ok(lessonService.getLessonsByCourseId(courseId));
     }
+
+    @GetMapping("/instructor/{instructorId}")
+    public ResponseEntity<List<Lesson>> getLessonsByInstructor(@PathVariable Long instructorId) {
+        return ResponseEntity.ok(lessonService.getLessonsByInstructorId(instructorId));
+    }
 }
 
